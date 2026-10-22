@@ -1,0 +1,14 @@
+<% if (item.history && item.history.length) { %>
+  <ul class="timeline">
+    <% item.history.slice().reverse().forEach(function(h){ %>
+      <li class="tl-<%= h.status %>">
+        <span class="tl-dot"></span>
+        <div>
+          <strong class="tl-status"><%= h.status %></strong>
+          <span class="muted small tl-date"><%= fmtDate(h.at) %></span>
+          <% if (h.note) { %><div class="small tl-note"><%= h.note %></div><% } %>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>

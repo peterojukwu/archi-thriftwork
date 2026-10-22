@@ -1,0 +1,37 @@
+<%- include('partials/header', { pageTitle: 'Sell an item' }) %>
+<section class="wrap auth">
+  <div class="auth-card wide">
+    <h1>List an item for sale</h1>
+    <% if (isAdmin) { %>
+      <p class="muted">As an admin, your item is published to the dashboard immediately.</p>
+    <% } else { %>
+      <p class="muted">Your item will be reviewed by an admin before it appears on the dashboard.</p>
+    <% } %>
+    <form method="post" action="/sell" enctype="multipart/form-data">
+      <div class="field"><label>Title *</label><input name="title" value="<%= form.title || '' %>" required placeholder="e.g. Triangular architect scale" /></div>
+      <div class="two">
+        <div class="field"><label>Price (<%= currency %>) *</label><input type="number" name="price" min="0" step="0.01" value="<%= form.price || '' %>" required /></div>
+        <div class="field"><label>Category *</label>
+          <select name="category" class="select" required>
+            <option value="" disabled <%= !form.category?'selected':'' %>>Choose…</option>
+            <% cfg.CATEGORIES.forEach(function(c){ %>
+              <option value="<%= c %>"<%= form.category===c?' selected':'' %>><%= c %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Condition</label>
+        <select name="condition" class="select">
+          <% ['New','Used – like new','Used – good','Used – fair'].forEach(function(c){ %>
+            <option value="<%= c %>"<%= form.condition===c?' selected':'' %>><%= c %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="field"><label>Location *</label><input name="location" value="<%= form.location || '' %>" required placeholder="e.g. University of Lagos — Architecture Dept" /><span class="muted small">Where buyers can collect the item (campus / city).</span></div>
+      <div class="field"><label>Description</label><textarea name="description" rows="4" placeholder="Describe the item, condition, pickup details…"><%= form.description || '' %></textarea></div>
+      <div class="field"><label>Photo</label><input type="file" name="image" accept="image/*" /><span class="muted small">JPG/PNG/WebP, up to 5MB.</span></div>
+      <button class="btn btn-primary full"><%= isAdmin ? 'Publish item' : 'Submit for review' %></button>
+    </form>
+  </div>
+</section>
+<%- include('partials/footer') %>

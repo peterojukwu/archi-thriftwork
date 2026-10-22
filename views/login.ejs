@@ -1,0 +1,14 @@
+<%- include('partials/header', { pageTitle: 'Log in' }) %>
+<section class="wrap auth">
+  <div class="auth-card">
+    <h1>Welcome back</h1>
+    <p class="muted">Log in to manage your listings.</p>
+    <form method="post" action="/login">
+      <div class="field"><label>Email</label><input type="email" name="email" value="<%= form.email || '' %>" required /></div>
+      <div class="field"><label>Password</label><input type="password" name="password" required /></div>
+      <button class="btn btn-primary full">Log in</button>
+    </form>
+    <p class="muted center small">New here? <a href="/register">Create an account</a></p>
+  </div>
+</section>
+<%- include('partials/footer') %>

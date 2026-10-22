@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' · ' : '' %>Archi Thrift</title>
+  <meta name="description" content="Archi Thrift — buy and sell architecture student materials. Drafting tools, model-making supplies and more." />
+  <link rel="icon" href="/logo.png" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="/js/main.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/"><img src="/logo.png" alt="Archi Thrift" class="brand-logo" /></a>
+      <nav class="main-nav">
+        <a href="/">Browse</a>
+        <% if (currentUser) { %>
+          <a href="/sell">Sell an item</a>
+          <a href="/my-items">My listings</a>
+          <% if (isAdmin) { %><a href="/admin" class="nav-admin">Admin</a><% } %>
+        <% } %>
+      </nav>
+      <div class="header-actions">
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button>
+        <% if (currentUser) { %>
+          <span class="hello">Hi, <%= currentUser.name.split(' ')[0] %></span>
+          <form action="/logout" method="post" class="inline"><button class="btn btn-ghost btn-sm">Log out</button></form>
+        <% } else { %>
+          <a href="/login" class="btn btn-ghost btn-sm">Log in</a>
+          <a href="/register" class="btn btn-primary btn-sm">Register</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+  <% if (flash) { %>
+    <div class="wrap"><div class="flash flash-<%= flash.type %>"><%= flash.msg %></div></div>
+  <% } %>
+  <main>

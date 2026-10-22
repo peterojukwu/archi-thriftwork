@@ -1,0 +1,45 @@
+<%- include('partials/header', { pageTitle: 'My listings' }) %>
+<section class="wrap page">
+  <div class="page-head">
+    <h1>My listings</h1>
+    <a href="/sell" class="btn btn-primary btn-sm">+ New listing</a>
+  </div>
+  <% if (items.length === 0) { %>
+    <p class="empty">You haven't listed anything yet. <a href="/sell">List your first item</a>.</p>
+  <% } else { %>
+    <div class="listing-list">
+      <% items.forEach(function(item){ %>
+        <article class="listing">
+          <div class="listing-main">
+            <a class="listing-thumb" href="/item/<%= item.id %>">
+              <% if (item.image) { %><img src="<%= item.image %>" alt="" /><% } else { %><div class="ph ph-sm"><%- catIcon(item.category) %></div><% } %>
+            </a>
+            <div class="listing-info">
+              <div class="listing-top">
+                <h3><a href="/item/<%= item.id %>"><%= item.title %></a></h3>
+                <span class="status status-<%= item.status %>"><%= item.status %></span>
+              </div>
+              <p class="muted small"><%= currency %><%= Number(item.price).toLocaleString() %> · <%= item.category %> · 📍 <%= item.location || 'N/A' %></p>
+              <% if (item.status === 'rejected') { %>
+                <div class="reason-box small"><strong>Rejected:</strong> <%= item.rejectReason || 'No reason provided.' %></div>
+              <% } %>
+              <div class="listing-actions">
+                <% if (item.status === 'approved') { %>
+                  <form method="post" action="/item/<%= item.id %>/sold"><button class="btn btn-ghost btn-sm">Mark as sold</button></form>
+                <% } else if (item.status === 'sold') { %>
+                  <form method="post" action="/item/<%= item.id %>/relist"><button class="btn btn-ghost btn-sm">Relist</button></form>
+                <% } %>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete this listing permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
+              </div>
+            </div>
+          </div>
+          <details class="listing-tl">
+            <summary>Status history (<%= (item.history||[]).length %>)</summary>
+            <%- include('partials/timeline', { item: item }) %>
+          </details>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+<%- include('partials/footer') %>

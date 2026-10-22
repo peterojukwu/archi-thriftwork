@@ -1,0 +1,64 @@
+<%- include('partials/header', { pageTitle: item.title }) %>
+<% var owns = currentUser && (isAdmin || item.sellerId === currentUser.id); %>
+<section class="wrap detail">
+  <a class="back" href="/">← Back to listings</a>
+  <div class="detail-grid">
+    <div class="detail-media">
+      <% if (item.image) { %>
+        <img src="<%= item.image %>" alt="<%= item.title %>" />
+      <% } else { %>
+        <div class="ph ph-big"><%- catIcon(item.category) %></div>
+      <% } %>
+      <% if (item.status === 'sold') { %><span class="ribbon">SOLD</span><% } %>
+    </div>
+    <div class="detail-info">
+      <span class="card-cat"><%= item.category %></span>
+      <h1><%= item.title %></h1>
+      <div class="price big"><%= currency %><%= Number(item.price).toLocaleString() %></div>
+      <ul class="meta">
+        <li><strong>Location:</strong> <%= item.location || 'N/A' %></li>
+        <li><strong>Condition:</strong> <%= item.condition || 'N/A' %></li>
+        <li><strong>Seller:</strong> <%= item.sellerName %></li>
+        <% if (item.status !== 'approved') { %>
+          <li><strong>Status:</strong> <span class="status status-<%= item.status %>"><%= item.status %></span></li>
+        <% } %>
+      </ul>
+      <% if (item.description) { %><p class="desc"><%= item.description %></p><% } %>
+
+      <% if (item.status === 'rejected' && owns) { %>
+        <div class="reason-box"><strong>Rejected:</strong> <%= item.rejectReason || 'No reason provided.' %></div>
+      <% } %>
+
+      <% if (item.status === 'sold') { %>
+        <div class="sold-note">This item has been sold.</div>
+      <% } else if (item.status === 'approved') { %>
+        <% if (cfg.ADMIN_WHATSAPP) { %>
+        <a class="btn btn-wa full" href="<%= waLink(item) %>" target="_blank" rel="noopener noreferrer">
+          <span class="wa-ico">💬</span> Enquire on WhatsApp
+        </a>
+        <p class="muted small center">You'll be taken to the admin's WhatsApp to ask about this item.</p>
+        <% } else { %>
+        <p class="muted small center">WhatsApp enquiries are not configured.</p>
+        <% } %>
+      <% } %>
+
+      <% if (owns) { %>
+        <div class="owner-actions">
+          <% if (item.status === 'approved') { %>
+            <form method="post" action="/item/<%= item.id %>/sold"><button class="btn btn-ghost btn-sm">Mark as sold</button></form>
+          <% } else if (item.status === 'sold') { %>
+            <form method="post" action="/item/<%= item.id %>/relist"><button class="btn btn-ghost btn-sm">Relist</button></form>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (owns && item.history && item.history.length) { %>
+    <section class="history">
+      <h2 class="sec-title">Status history</h2>
+      <%- include('partials/timeline', { item: item }) %>
+    </section>
+  <% } %>
+</section>
+<%- include('partials/footer') %>

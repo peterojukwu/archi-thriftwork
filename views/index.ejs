@@ -1,0 +1,46 @@
+<%- include('partials/header', { pageTitle: 'Browse materials' }) %>
+
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">Architecture student marketplace</p>
+      <h1>Buy &amp; sell studio materials — the thrifty way.</h1>
+      <p class="lede">Drafting tools, model-making supplies, books and more, listed by fellow students. Browse freely; enquire in one tap on WhatsApp.</p>
+      <div class="hero-cta">
+        <a href="#listings" class="btn btn-primary">Browse listings</a>
+        <% if (currentUser) { %>
+          <a href="/sell" class="btn btn-ghost">Sell an item</a>
+        <% } else { %>
+          <a href="/register" class="btn btn-ghost">Register to sell</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="listings" class="catalog">
+  <div class="wrap">
+    <form class="toolbar" method="get" action="/#listings">
+      <input class="search" type="search" name="q" value="<%= q %>" placeholder="Search listings…" />
+      <select name="category" class="select">
+        <option value="all"<%= category==='all'?' selected':'' %>>All categories</option>
+        <% cfg.CATEGORIES.forEach(function(c){ %>
+          <option value="<%= c %>"<%= category===c?' selected':'' %>><%= c %></option>
+        <% }) %>
+      </select>
+      <button class="btn btn-primary btn-sm">Filter</button>
+    </form>
+
+    <% if (items.length === 0) { %>
+      <p class="empty">No approved listings yet. Check back soon!</p>
+    <% } else { %>
+      <div class="grid">
+        <% items.forEach(function(item){ %>
+          <%- include('partials/card', { item: item }) %>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

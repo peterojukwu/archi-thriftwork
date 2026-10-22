@@ -1,0 +1,23 @@
+<article class="card <%= item.status === 'sold' ? 'is-sold' : '' %>">
+  <a class="card-thumb" href="/item/<%= item.id %>">
+    <% if (item.image) { %>
+      <img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy" />
+    <% } else { %>
+      <div class="ph ph-<%= item.category.replace(/[^a-z]/gi,'').toLowerCase() %>"><%- catIcon(item.category) %></div>
+    <% } %>
+    <% if (item.status === 'sold') { %>
+      <span class="status status-sold">Sold</span>
+    <% } else if (item.status && item.status !== 'approved') { %>
+      <span class="status status-<%= item.status %>"><%= item.status %></span>
+    <% } %>
+  </a>
+  <div class="card-body">
+    <span class="card-cat"><%= item.category %></span>
+    <h3><a href="/item/<%= item.id %>"><%= item.title %></a></h3>
+    <p class="card-loc">📍 <%= item.location || 'Location N/A' %></p>
+    <div class="card-foot">
+      <span class="price"><%= currency %><%= Number(item.price).toLocaleString() %></span>
+      <span class="muted small">by <%= item.sellerName %></span>
+    </div>
+  </div>
+</article>

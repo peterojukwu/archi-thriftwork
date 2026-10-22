@@ -1,0 +1,111 @@
+<%- include('partials/header', { pageTitle: 'Admin' }) %>
+<section class="wrap page">
+  <div class="page-head">
+    <h1>Admin dashboard</h1>
+    <a href="/sell" class="btn btn-primary btn-sm">+ Post an item</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-n"><%= pending.length %></span><span>Pending</span></div>
+    <div class="stat"><span class="stat-n"><%= approved.length %></span><span>Live</span></div>
+    <div class="stat"><span class="stat-n"><%= sold.length %></span><span>Sold</span></div>
+    <div class="stat"><span class="stat-n"><%= rejected.length %></span><span>Rejected</span></div>
+  </div>
+
+  <h2 class="sec-title">Pending approval</h2>
+  <% if (pending.length === 0) { %>
+    <p class="empty">Nothing waiting for review.</p>
+  <% } else { %>
+    <div class="mod-list">
+      <% pending.forEach(function(item){ %>
+        <div class="mod-row">
+          <a class="mod-thumb" href="/item/<%= item.id %>">
+            <% if (item.image) { %><img src="<%= item.image %>" alt="" /><% } else { %><div class="ph ph-sm"><%- catIcon(item.category) %></div><% } %>
+          </a>
+          <div class="mod-info">
+            <h3><a href="/item/<%= item.id %>"><%= item.title %></a></h3>
+            <p class="muted small"><%= currency %><%= Number(item.price).toLocaleString() %> · <%= item.category %> · 📍 <%= item.location || 'N/A' %> · by <%= item.sellerName %></p>
+            <% if (item.description) { %><p class="small"><%= item.description %></p><% } %>
+          </div>
+          <div class="mod-actions">
+            <form method="post" action="/admin/<%= item.id %>/approve"><button class="btn btn-primary btn-sm">Approve</button></form>
+            <form method="post" action="/admin/<%= item.id %>/reject" class="reject-form">
+              <input type="text" name="reason" placeholder="Reason (shown to seller)" class="reason-input" />
+              <button class="btn btn-ghost btn-sm">Reject</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <h2 class="sec-title">Live on dashboard</h2>
+  <% if (approved.length === 0) { %>
+    <p class="empty">No live items yet.</p>
+  <% } else { %>
+    <table class="tbl">
+      <thead><tr><th>Item</th><th>Price</th><th>Location</th><th>Seller</th><th></th></tr></thead>
+      <tbody>
+        <% approved.forEach(function(item){ %>
+          <tr>
+            <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
+            <td data-l="Price"><%= currency %><%= Number(item.price).toLocaleString() %></td>
+            <td data-l="Location"><%= item.location || 'N/A' %></td>
+            <td data-l="Seller"><%= item.sellerName %></td>
+            <td data-l="">
+              <div class="inline-actions">
+                <form method="post" action="/item/<%= item.id %>/sold"><button class="btn btn-ghost btn-sm">Mark sold</button></form>
+                <form method="post" action="/admin/<%= item.id %>/reject"><button class="btn btn-ghost btn-sm">Unpublish</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <% if (sold.length) { %>
+    <h2 class="sec-title">Sold</h2>
+    <table class="tbl">
+      <thead><tr><th>Item</th><th>Price</th><th>Seller</th><th></th></tr></thead>
+      <tbody>
+        <% sold.forEach(function(item){ %>
+          <tr>
+            <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
+            <td data-l="Price"><%= currency %><%= Number(item.price).toLocaleString() %></td>
+            <td data-l="Seller"><%= item.sellerName %></td>
+            <td data-l="">
+              <div class="inline-actions">
+                <form method="post" action="/item/<%= item.id %>/relist"><button class="btn btn-ghost btn-sm">Relist</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <% if (rejected.length) { %>
+    <h2 class="sec-title">Rejected</h2>
+    <table class="tbl">
+      <thead><tr><th>Item</th><th>Reason</th><th>Seller</th><th></th></tr></thead>
+      <tbody>
+        <% rejected.forEach(function(item){ %>
+          <tr>
+            <td data-l="Item"><%= item.title %></td>
+            <td data-l="Reason"><span class="muted small"><%= item.rejectReason || '—' %></span></td>
+            <td data-l="Seller"><%= item.sellerName %></td>
+            <td data-l="">
+              <div class="inline-actions">
+                <form method="post" action="/admin/<%= item.id %>/approve"><button class="btn btn-primary btn-sm">Approve</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</section>
+<%- include('partials/footer') %>
