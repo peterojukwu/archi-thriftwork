@@ -139,14 +139,24 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  const { name, email, password, confirm } = req.body;
-  const form = { name, email };
+  const { name, email, phone, password, confirm } = req.body;
+  const form = { name, email, phone };
   if (!name || !email || !password) { flash(req, 'error', 'All fields are required.'); return res.render('register', { form }); }
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedPhone = (phone || '').replace(/[\s().-]/g, '');
+  if (!/^\+?\d{7,15}$/.test(normalizedPhone)) {
+    flash(req, 'error', 'Enter a valid phone number with 7 to 15 digits.');
+    return res.render('register', { form });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    flash(req, 'error', 'Enter a valid email address.');
+    return res.render('register', { form });
+  }
   if (password.length < 6) { flash(req, 'error', 'Password must be at least 6 characters.'); return res.render('register', { form }); }
   if (password !== confirm) { flash(req, 'error', 'Passwords do not match.'); return res.render('register', { form }); }
-  if (store.findUserByEmail(email)) { flash(req, 'error', 'An account with that email already exists.'); return res.render('register', { form }); }
+  if (store.findUserByEmail(normalizedEmail)) { flash(req, 'error', 'An account with that email already exists.'); return res.render('register', { form }); }
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = store.addUser({ name: name.trim(), email: email.trim(), passwordHash, role: 'user' });
+  const user = store.addUser({ name: name.trim(), email: normalizedEmail, phone: normalizedPhone, passwordHash, role: 'user' });
   req.session.userId = user.id;
   flash(req, 'success', `Welcome, ${user.name}! You can now list items for sale.`);
   res.redirect('/my-items');
@@ -217,8 +227,8 @@ function seedProducts(admin) {
 const PORT = cfg.PORT;
 seedAdmin().then((admin) => {
   seedProducts(admin);
-  app.listen(PORT, '127.0.0.3', () => {
-    console.log(`\nArchi Thrift running at http://127.0.0.3:${PORT}`);
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`\nArchi Thrift running at http://127.0.0.1:${PORT}`);
     console.log(`Admin login email: ${cfg.ADMIN_EMAIL}`);
     const mailMode = !cfg.EMAIL.ENABLED ? 'off'
       : (cfg.EMAIL.SMTP_HOST ? `SMTP ${cfg.EMAIL.SMTP_HOST}:${cfg.EMAIL.SMTP_PORT}` : 'log-only (set SMTP_* to send real email)');

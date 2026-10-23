@@ -4,8 +4,9 @@
     <h1>Create your account</h1>
     <p class="muted">Register to list items for sale. Browsing is open to everyone.</p>
     <form method="post" action="/register">
-      <div class="field"><label>Full name</label><input name="name" value="<%= form.name || '' %>" required /></div>
-      <div class="field"><label>Email</label><input type="email" name="email" value="<%= form.email || '' %>" required /></div>
+      <div class="field"><label>Full name</label><input name="name" value="<%= form.name || '' %>" autocomplete="name" required /></div>
+      <div class="field"><label>Email</label><input type="email" name="email" value="<%= form.email || '' %>" autocomplete="email" required /></div>
+      <div class="field"><label>Phone number</label><input type="tel" name="phone" value="<%= form.phone || '' %>" autocomplete="tel" placeholder="+234 801 234 5678" required /></div>
       <div class="field"><label>Password</label><input type="password" name="password" minlength="6" required /></div>
       <div class="field"><label>Confirm password</label><input type="password" name="confirm" minlength="6" required /></div>
       <button class="btn btn-primary full">Create account</button>

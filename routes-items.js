@@ -105,7 +105,8 @@ app.get('/admin', requireAdmin, (req, res) => {
   const approved = store.listItems({ status: 'approved' });
   const rejected = store.listItems({ status: 'rejected' });
   const sold = store.listItems({ status: 'sold' });
-  res.render('admin', { pending, approved, rejected, sold });
+  const users = store.db.users.map(({ id, name, email, phone, createdAt, role }) => ({ id, name, email, phone, createdAt, role }));
+  res.render('admin', { pending, approved, rejected, sold, users });
 });
 
 app.post('/admin/:id/approve', requireAdmin, (req, res) => {

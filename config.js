@@ -5,7 +5,7 @@ module.exports = {
 
   // The admin's WhatsApp number in INTERNATIONAL format, digits only (no +, spaces or dashes).
   // Example: UK 7700 900123 -> '447700900123'. Change this to the real store number.
-  ADMIN_WHATSAPP: process.env.ADMIN_WHATSAPP || '',
+  ADMIN_WHATSAPP: (process.env.ADMIN_WHATSAPP || '+234 8108860060').replace(/\D/g, ''),
 
   // Seed admin account (created on first run if no admin exists).
   ADMIN_NAME: process.env.ADMIN_NAME || 'Archi Thrift Admin',
@@ -38,7 +38,7 @@ module.exports = {
     // Where "new item submitted" alerts go (defaults to the admin email).
     ADMIN_TO: process.env.EMAIL_ADMIN_TO || process.env.ADMIN_EMAIL || 'admin@archithrift.com',
     // Base URL used to build links inside emails (no trailing slash).
-    BASE_URL: process.env.BASE_URL || 'http://127.0.0.3:' + (process.env.PORT || 3000),
+    BASE_URL: process.env.BASE_URL || 'http://127.0.0.1:' + (process.env.PORT || 3000),
     // SMTP transport. Fill these in to actually send mail (e.g. your provider's SMTP).
     SMTP_HOST: process.env.SMTP_HOST || '',
     SMTP_PORT: Number(process.env.SMTP_PORT || 587),

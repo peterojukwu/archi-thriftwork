@@ -11,6 +11,26 @@
     <div class="stat"><span class="stat-n"><%= rejected.length %></span><span>Rejected</span></div>
   </div>
 
+  <h2 class="sec-title">Registered users</h2>
+  <% if (users.length === 0) { %>
+    <p class="empty">No registered users yet.</p>
+  <% } else { %>
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th></tr></thead>
+      <tbody>
+        <% users.forEach(function(user){ %>
+          <tr>
+            <td data-l="Name"><%= user.name %></td>
+            <td data-l="Email"><a href="mailto:<%= user.email %>"><%= user.email %></a></td>
+            <td data-l="Phone"><%= user.phone || 'Not provided' %></td>
+            <td data-l="Role"><%= user.role %></td>
+            <td data-l="Joined"><%= user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
   <h2 class="sec-title">Pending approval</h2>
   <% if (pending.length === 0) { %>
     <p class="empty">Nothing waiting for review.</p>
