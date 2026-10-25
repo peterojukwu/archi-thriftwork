@@ -116,7 +116,8 @@ img{max-width:100%;display:block}
 .auth-card .muted{margin:6px 0 14px}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
 .field label{font-size:.85rem;font-weight:600}
-.field input,.field textarea,.field select{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+.field input,.field textarea,.field select{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);color:var(--ink)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);opacity:1}
 .field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--burgundy);border-color:transparent}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
