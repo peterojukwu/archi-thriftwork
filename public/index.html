@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f3ed" />
+  <meta name="description" content="Browse and exchange architecture studio materials on Archi Thrift." />
+  <title>Archi Thrift | Studio Marketplace</title>
+  <link rel="icon" href="/logo.png" />
+  <link rel="stylesheet" href="/css/marketplace.css" />
+  <script src="/js/marketplace-data.js" defer></script>
+  <script src="/js/marketplace.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Archi Thrift home">
+      <img src="/logo.png" alt="" />
+      <span>Archi Thrift</span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="nav-current" href="#listings">Browse</a>
+      <button class="nav-link" type="button" data-auth-open data-auth-mode="register" data-auth-reason="sell">Sell an item</button>
+    </nav>
+    <div class="header-actions">
+      <button class="sign-in-link" type="button" data-auth-open data-auth-mode="login" data-auth-reason="signin">Sign in</button>
+      <button class="join-button" type="button" data-auth-open data-auth-mode="register" data-auth-reason="register">Create account</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="market-hero" aria-labelledby="hero-title">
+      <video class="hero-video" autoplay muted loop playsinline aria-hidden="true" tabindex="-1">
+        <source src="/video/hero-bg.webm" type="video/webm" />
+      </video>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="hero-kicker">Architecture student marketplace</p>
+        <h1 id="hero-title">Buy &amp; sell studio materials — the thrifty way.</h1>
+        <p>Drafting tools, model-making supplies, books and more, listed by fellow students. Browse freely; enquire in one tap on WhatsApp.</p>
+        <div class="hero-actions">
+          <a class="hero-button hero-button-light" href="#listings">Browse listings <span aria-hidden="true">&#8595;</span></a>
+          <button class="hero-button hero-button-outline" type="button" data-auth-open data-auth-mode="register" data-auth-reason="sell">Sell an item <span aria-hidden="true">&#8594;</span></button>
+        </div>
+      </div>
+      <p class="hero-index">Archi Thrift <span>·</span> Lagos &amp; beyond</p>
+    </section>
+
+    <section class="catalog-section" id="listings" aria-labelledby="catalog-title">
+      <div class="catalog-heading">
+        <div>
+          <p class="section-kicker">From one studio to another</p>
+          <h2 id="catalog-title">On the worktable</h2>
+        </div>
+        <p class="catalog-count" id="catalog-count" aria-live="polite"></p>
+      </div>
+      <form class="catalog-tools" id="catalog-tools" role="search">
+        <label class="search-box">
+          <span class="visually-hidden">Search listings</span>
+          <span class="search-icon" aria-hidden="true"></span>
+          <input id="search-input" type="search" placeholder="Search tools, books, materials..." autocomplete="off" />
+        </label>
+        <label class="filter-box">
+          <span class="visually-hidden">Filter by category</span>
+          <select id="category-filter">
+            <option value="all">All categories</option>
+            <option>Drafting tools</option>
+            <option>Model-making</option>
+            <option>Cutting tools</option>
+            <option>Paper &amp; media</option>
+            <option>Adhesives &amp; finishing</option>
+            <option>Books &amp; references</option>
+            <option>Software &amp; licenses</option>
+            <option>Other</option>
+          </select>
+        </label>
+      </form>
+      <div class="listing-grid" id="listing-grid"></div>
+      <p class="empty-state" id="empty-state" hidden>No listings match that search. Try another term or category.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="footer-brand" href="/">Archi Thrift</a>
+    <span>Pass it on. Make something new.</span>
+    <button type="button" data-auth-open data-auth-mode="register" data-auth-reason="register">Join the exchange <span aria-hidden="true">&#8594;</span></button>
+  </footer>
+
+  <dialog class="modal listing-modal" id="listing-dialog" aria-labelledby="listing-title">
+    <button class="modal-close" type="button" data-close-dialog aria-label="Close listing details">&times;</button>
+    <div id="listing-detail"></div>
+  </dialog>
+
+  <dialog class="modal auth-modal" id="auth-dialog" aria-labelledby="auth-title">
+    <button class="modal-close" type="button" data-close-dialog aria-label="Close account dialog">&times;</button>
+    <div class="auth-modal-header">
+      <p class="section-kicker">Archi Thrift account</p>
+      <h2 id="auth-title">Welcome back</h2>
+      <p id="auth-description">Sign in to your account.</p>
+    </div>
+    <div class="auth-tabs" role="tablist" aria-label="Account access">
+      <button class="auth-tab is-active" id="login-tab" type="button" role="tab" aria-selected="true" aria-controls="login-panel" data-auth-tab="login">Sign in</button>
+      <button class="auth-tab" id="register-tab" type="button" role="tab" aria-selected="false" aria-controls="register-panel" data-auth-tab="register" tabindex="-1">Create account</button>
+    </div>
+    <section class="auth-panel" id="login-panel" role="tabpanel" aria-labelledby="login-tab">
+      <form id="login-form" novalidate>
+        <label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" placeholder="you@university.edu" required /></label>
+        <label class="field"><span>Password</span><input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="8" /></label>
+        <button class="submit-button" type="submit">Sign in <span aria-hidden="true">&#8594;</span></button>
+      </form>
+    </section>
+    <section class="auth-panel" id="register-panel" role="tabpanel" aria-labelledby="register-tab" hidden>
+      <form id="register-form" novalidate>
+        <label class="field"><span>Full name</span><input name="name" type="text" autocomplete="name" placeholder="Your name" required /></label>
+        <label class="field"><span>Email address</span><input name="email" type="email" autocomplete="email" placeholder="you@university.edu" required /></label>
+        <div class="field-row">
+          <label class="field"><span>Phone number</span><input name="phone" type="tel" autocomplete="tel" placeholder="+234 801 234 5678" required /></label>
+          <label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="8 characters minimum" required minlength="8" /></label>
+        </div>
+        <label class="field"><span>Confirm password</span><input name="confirm" type="password" autocomplete="new-password" placeholder="Enter it again" required minlength="8" /></label>
+        <button class="submit-button" type="submit">Create account <span aria-hidden="true">&#8594;</span></button>
+      </form>
+    </section>
+    <p class="form-message" id="form-message" role="status" aria-live="polite" hidden></p>
+    <p class="account-note">Browsing is open to everyone. Account actions are a preview until the backend is connected.</p>
+  </dialog>
+</body>
+</html>

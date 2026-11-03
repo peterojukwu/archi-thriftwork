@@ -19,6 +19,8 @@
           <a href="/sell">Sell an item</a>
           <a href="/my-items">My listings</a>
           <% if (isAdmin) { %><a href="/admin" class="nav-admin">Admin</a><% } %>
+        <% } else { %>
+          <a href="/login?next=%2Fsell">Sell an item</a>
         <% } %>
       </nav>
       <div class="header-actions">

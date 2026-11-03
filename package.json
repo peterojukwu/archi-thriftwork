@@ -4,6 +4,7 @@
   "description": "Archi Thrift — architecture student materials marketplace with user uploads, admin approval, and WhatsApp enquiries.",
   "main": "app.js",
   "scripts": {
+    "build": "node scripts/build-static-preview.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "migrate": "node scripts/migrate.js",

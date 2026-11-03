@@ -32,7 +32,13 @@
       <% if (item.status === 'sold') { %>
         <div class="sold-note">This item has been sold.</div>
       <% } else if (item.status === 'approved') { %>
-        <% if (cfg.ADMIN_WHATSAPP) { %>
+        <% if (!currentUser) { %>
+        <p class="muted small center">Sign in or register to enquire about this item.</p>
+        <div class="owner-actions">
+          <a class="btn btn-primary btn-sm" href="/login?next=%2Fitem%2F<%= item.id %>">Log in to enquire</a>
+          <a class="btn btn-ghost btn-sm" href="/register?next=%2Fitem%2F<%= item.id %>">Register</a>
+        </div>
+        <% } else if (cfg.ADMIN_WHATSAPP) { %>
         <a class="btn btn-wa full" href="<%= waLink(item) %>" target="_blank" rel="noopener noreferrer">
           <span class="wa-ico">💬</span> Enquire on WhatsApp
         </a>

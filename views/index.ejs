@@ -23,7 +23,7 @@
 
 <section id="listings" class="catalog">
   <div class="wrap">
-    <form class="toolbar" method="get" action="/#listings">
+    <form class="toolbar" id="catalogFilter" method="get" action="/#listings">
       <input class="search" type="search" name="q" value="<%= q %>" placeholder="Search listings…" />
       <select name="category" class="select">
         <option value="all"<%= category==='all'?' selected':'' %>>All categories</option>
@@ -42,6 +42,7 @@
           <%- include('partials/card', { item: item }) %>
         <% }) %>
       </div>
+      <p class="empty" id="noSearchResults" hidden>No listings match your search. Try another term or category.</p>
     <% } %>
   </div>
 </section>

@@ -1,11 +1,16 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
-  ],
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "{views,public}/**"
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "public" }
     }
-  }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "^/item/(\\d+)/?$", "dest": "/item/$1.html" },
+    { "src": "^/(sell|my-items|admin)/?$", "dest": "/login.html" },
+    { "src": "^/(login|register)/?$", "dest": "/$1.html" }
+  ]
 }

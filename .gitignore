@@ -4,3 +4,9 @@ node_modules/
 data/db.json
 public/uploads/*
 !public/uploads/.gitkeep
+.env*
+config.js
+public/item/
+public/login.html
+public/register.html
+public/js/marketplace-data.js

@@ -39,5 +39,46 @@
         if (!window.confirm(form.getAttribute('data-confirm'))) e.preventDefault();
       });
     });
+
+    var filterForm = document.getElementById('catalogFilter');
+    if (filterForm) {
+      var search = filterForm.querySelector('input[name="q"]');
+      var category = filterForm.querySelector('select[name="category"]');
+      var cards = Array.from(document.querySelectorAll('.listing-grid .card, .grid .card'));
+      var empty = document.getElementById('noSearchResults');
+      var filterListings = function () {
+        var term = search.value.trim().toLowerCase();
+        var shown = 0;
+        cards.forEach(function (card) {
+          var matches = (!term || card.dataset.search.toLowerCase().includes(term)) &&
+            (category.value === 'all' || card.dataset.category === category.value);
+          card.style.display = matches ? '' : 'none';
+          if (matches) shown++;
+        });
+        if (empty) empty.hidden = shown > 0;
+      };
+      search.addEventListener('input', filterListings);
+      category.addEventListener('change', filterListings);
+      filterForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        filterListings();
+      });
+    }
+
+    document.querySelectorAll('form[action="/login"], form[action="/register"]').forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        var message = document.getElementById('auth-preview-message');
+        if (!message) {
+          message = document.createElement('div');
+          message.id = 'auth-preview-message';
+          message.className = 'wrap';
+          message.innerHTML = '<div class="flash flash-error"></div>';
+          document.querySelector('.site-header').after(message);
+        }
+        message.firstElementChild.textContent = 'Account access is not connected yet. This preview does not store your details.';
+      });
+    });
   });
 })();
