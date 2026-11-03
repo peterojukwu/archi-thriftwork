@@ -15,7 +15,7 @@ module.exports = {
   ADMIN_WHATSAPP: (process.env.ADMIN_WHATSAPP || '').replace(/\D/g, ''),
   ADMIN_NAME: process.env.ADMIN_NAME || 'Archi Thrift Admin',
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@archithrift.com',
-  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || '',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'Admin123',
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
   CATEGORIES: [
     'Drafting tools',
