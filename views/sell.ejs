@@ -29,7 +29,7 @@
       </div>
       <div class="field"><label>Location *</label><input name="location" value="<%= form.location || '' %>" required placeholder="e.g. University of Lagos — Architecture Dept" /><span class="muted small">Where buyers can collect the item (campus / city).</span></div>
       <div class="field"><label>Description</label><textarea name="description" rows="4" placeholder="Describe the item, condition, pickup details…"><%= form.description || '' %></textarea></div>
-      <div class="field"><label>Photo</label><input type="file" name="image" accept="image/*" /><span class="muted small">JPG/PNG/WebP, up to 5MB.</span></div>
+      <div class="field"><label>Photo</label><input type="file" name="image" accept="image/*" /><span class="muted small">JPG/PNG/WebP, up to 4MB.</span></div>
       <button class="btn btn-primary full"><%= isAdmin ? 'Publish item' : 'Submit for review' %></button>
     </form>
   </div>

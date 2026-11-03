@@ -1,17 +1,22 @@
-// Central configuration. Override any of these with environment variables.
+require('dotenv').config();
+
+const isProduction = process.env.NODE_ENV === 'production';
+if (isProduction && !process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET must be set when NODE_ENV=production.');
+}
+
+const port = process.env.PORT || 3000;
+const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+
 module.exports = {
-  PORT: process.env.PORT || 3000,
-  SESSION_SECRET: process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex'),
-
-  // The admin's WhatsApp number in INTERNATIONAL format, digits only (no +, spaces or dashes).
-  // Example: UK 7700 900123 -> '447700900123'. Change this to the real store number.
-  ADMIN_WHATSAPP: (process.env.ADMIN_WHATSAPP || '+234 8108860060').replace(/\D/g, ''),
-
-  // Seed admin account (created on first run if no admin exists).
+  PORT: port,
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  SESSION_SECRET: process.env.SESSION_SECRET || 'archi-thrift-local-development-secret-change-me',
+  ADMIN_WHATSAPP: (process.env.ADMIN_WHATSAPP || '').replace(/\D/g, ''),
   ADMIN_NAME: process.env.ADMIN_NAME || 'Archi Thrift Admin',
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@archithrift.com',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || '',
-
+  BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
   CATEGORIES: [
     'Drafting tools',
     'Model-making',
@@ -22,27 +27,15 @@ module.exports = {
     'Software & licenses',
     'Other',
   ],
-
   CURRENCY: process.env.CURRENCY || '₦',
-
-  // ---- Email notifications (optional) ----
-  // Sellers get an email when their listing changes status (approved / rejected /
-  // sold / relisted); the admin gets one when a new item is submitted for review.
-  // Leave SMTP_HOST empty to run in "log-only" mode: the app still works and
-  // prints each notification to the console instead of sending real email.
   EMAIL: {
-    // Master switch. Set EMAIL_ENABLED=false to turn all notifications off.
     ENABLED: process.env.EMAIL_ENABLED !== 'false',
-    // "From" header shown to recipients.
     FROM: process.env.EMAIL_FROM || 'Archi Thrift <no-reply@archithrift.com>',
-    // Where "new item submitted" alerts go (defaults to the admin email).
     ADMIN_TO: process.env.EMAIL_ADMIN_TO || process.env.ADMIN_EMAIL || 'admin@archithrift.com',
-    // Base URL used to build links inside emails (no trailing slash).
-    BASE_URL: process.env.BASE_URL || 'http://127.0.0.1:' + (process.env.PORT || 3000),
-    // SMTP transport. Fill these in to actually send mail (e.g. your provider's SMTP).
+    BASE_URL: process.env.BASE_URL || vercelUrl || `http://localhost:${port}`,
     SMTP_HOST: process.env.SMTP_HOST || '',
     SMTP_PORT: Number(process.env.SMTP_PORT || 587),
-    SMTP_SECURE: process.env.SMTP_SECURE === 'true', // true for port 465
+    SMTP_SECURE: process.env.SMTP_SECURE === 'true',
     SMTP_USER: process.env.SMTP_USER || '',
     SMTP_PASS: process.env.SMTP_PASS || '',
   },

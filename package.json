@@ -2,19 +2,25 @@
   "name": "archi-thrift",
   "version": "1.0.0",
   "description": "Archi Thrift — architecture student materials marketplace with user uploads, admin approval, and WhatsApp enquiries.",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js"
   },
   "engines": {
-    "node": ">=16"
+    "node": "20.x"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",
+    "cookie-session": "^2.1.0",
+    "dotenv": "^16.4.7",
     "ejs": "3.1.10",
     "express": "^4.22.3",
-    "express-session": "^1.19.0",
     "multer": "1.4.5-lts.1",
-    "nodemailer": "^10.2.1"
+    "nodemailer": "^10.2.1",
+    "pg": "^8.13.1",
+    "@vercel/blob": "^1.1.1"
   }
 }

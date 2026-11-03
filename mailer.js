@@ -1,17 +1,13 @@
 // Automated email notifications for listing status changes.
 //
-// Works out of the box with NO configuration: if no SMTP host is set (or the
-// nodemailer package is missing) it runs in "log-only" mode and prints each
-// notification to the console instead of sending a real email. Set the SMTP_*
+// Without an SMTP host, notifications are printed to the console. Set the SMTP_*
 // values in config.js (or the matching env vars) to send real mail.
 //
-// All sends are best-effort and non-blocking: a mail failure never breaks the
+// Sends are awaited with a short timeout; a mail failure never breaks the
 // request that triggered it.
 
 const cfg = require('./config');
-
-let nodemailer = null;
-try { nodemailer = require('nodemailer'); } catch (e) { /* optional dependency */ }
+const nodemailer = require('nodemailer');
 
 let _transporter = null;
 let _transporterTried = false;
@@ -19,14 +15,27 @@ let _transporterTried = false;
 function getTransporter() {
   if (_transporterTried) return _transporter;
   _transporterTried = true;
-  if (!nodemailer || !cfg.EMAIL.SMTP_HOST) { _transporter = null; return null; }
+  if (!cfg.EMAIL.SMTP_HOST) { _transporter = null; return null; }
   _transporter = nodemailer.createTransport({
     host: cfg.EMAIL.SMTP_HOST,
     port: cfg.EMAIL.SMTP_PORT,
     secure: cfg.EMAIL.SMTP_SECURE,
     auth: cfg.EMAIL.SMTP_USER ? { user: cfg.EMAIL.SMTP_USER, pass: cfg.EMAIL.SMTP_PASS } : undefined,
+    connectionTimeout: 3000,
+    greetingTimeout: 3000,
+    socketTimeout: 5000,
   });
   return _transporter;
+}
+
+function sendWithTimeout(transporter, message) {
+  let timeout;
+  return Promise.race([
+    transporter.sendMail(message),
+    new Promise((resolve, reject) => {
+      timeout = setTimeout(() => reject(new Error('Email delivery timed out.')), 4000);
+    }),
+  ]).finally(() => clearTimeout(timeout));
 }
 
 const money = (n) => cfg.CURRENCY + Number(n || 0).toLocaleString();
@@ -98,7 +107,7 @@ function buildMessage(item, status, extra) {
 }
 
 // Fire a notification for a status change. `store` is the db module (to look up
-// the seller's email). Returns a promise but callers can fire-and-forget.
+// the seller's email). The request waits for the bounded delivery attempt.
 async function notifyStatusChange(store, item, status, extra) {
   try {
     if (!cfg.EMAIL.ENABLED || !item) return;
@@ -109,7 +118,7 @@ async function notifyStatusChange(store, item, status, extra) {
     if (status === 'submitted') {
       to = cfg.EMAIL.ADMIN_TO;
     } else {
-      const seller = store.findUserById(item.sellerId);
+      const seller = await store.findUserById(item.sellerId);
       to = seller && seller.email;
     }
     if (!to) return;
@@ -122,11 +131,12 @@ async function notifyStatusChange(store, item, status, extra) {
       console.log(`[email] (log-only; SMTP not configured) to=${to} | ${subject}`);
       return;
     }
-    await transporter.sendMail({ from: cfg.EMAIL.FROM, to, subject, text, html });
+    await sendWithTimeout(transporter, { from: cfg.EMAIL.FROM, to, subject, text, html });
     console.log(`[email] sent to ${to} | ${subject}`);
   } catch (err) {
     console.error('[email] notification failed:', err && err.message);
   }
+
 }
 
 module.exports = { notifyStatusChange, buildMessage };
