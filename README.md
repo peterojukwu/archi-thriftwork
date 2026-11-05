@@ -12,7 +12,7 @@ and original video hero. Listings are generated from `seed-data.js` at build tim
   authenticate users, or store submitted details.
 - The single-admin and multiple-user account system is not connected yet.
 
-## Build and deploy
+## Build and deploy§
 
 Use Node.js 26:
 

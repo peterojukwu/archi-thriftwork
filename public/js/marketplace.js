@@ -1,4 +1,31 @@
 (function () {
+  var themeButton = document.getElementById('theme-toggle');
+  var themeColor = document.getElementById('theme-color');
+  var themeKey = 'archi-theme';
+
+  function applyTheme(theme) {
+    var dark = theme === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    themeButton.textContent = dark ? '☀️' : '🌙';
+    themeButton.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeButton.setAttribute('title', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeButton.setAttribute('aria-pressed', String(dark));
+    themeColor.setAttribute('content', dark ? '#171c19' : '#f6f3ed');
+  }
+
+  var initialTheme = 'light';
+  try {
+    var savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme === 'dark' || savedTheme === 'light') initialTheme = savedTheme;
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) initialTheme = 'dark';
+  } catch (error) {}
+  applyTheme(initialTheme);
+  themeButton.addEventListener('click', function () {
+    var nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme);
+    try { localStorage.setItem(themeKey, nextTheme); } catch (error) {}
+  });
+
   var listings = window.ARCHI_LISTINGS || [];
   var currency = window.ARCHI_CURRENCY || '₦';
   var grid = document.getElementById('listing-grid');

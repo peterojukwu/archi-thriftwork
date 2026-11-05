@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f6f3ed" />
+  <meta name="theme-color" id="theme-color" content="#f6f3ed" />
   <meta name="description" content="Browse and exchange architecture studio materials on Archi Thrift." />
   <title>Archi Thrift | Studio Marketplace</title>
   <link rel="icon" href="/logo.png" />
@@ -22,6 +22,7 @@
       <button class="nav-link" type="button" data-auth-open data-auth-mode="register" data-auth-reason="sell">Sell an item</button>
     </nav>
     <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">🌙</button>
       <button class="sign-in-link" type="button" data-auth-open data-auth-mode="login" data-auth-reason="signin">Sign in</button>
       <button class="join-button" type="button" data-auth-open data-auth-mode="register" data-auth-reason="register">Create account</button>
     </div>
@@ -42,7 +43,7 @@
           <button class="hero-button hero-button-outline" type="button" data-auth-open data-auth-mode="register" data-auth-reason="sell">Sell an item <span aria-hidden="true">&#8594;</span></button>
         </div>
       </div>
-      <p class="hero-index">Archi Thrift <span>·</span> Lagos &amp; beyond</p>
+      <!-- <p class="hero-index">Archi Thrift <span>·</span> Lagos &amp; beyond</p> -->
     </section>
 
     <section class="catalog-section" id="listings" aria-labelledby="catalog-title">
