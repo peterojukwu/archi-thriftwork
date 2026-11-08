@@ -1,4 +1,10 @@
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Load local overrides first, then fill any missing values from .env. Values
+// already supplied by the runtime (for example Vercel) keep highest priority.
+dotenv.config({ path: path.join(__dirname, '.env.local') });
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction && !process.env.SESSION_SECRET) {
@@ -15,8 +21,10 @@ module.exports = {
   ADMIN_WHATSAPP: (process.env.ADMIN_WHATSAPP || '').replace(/\D/g, ''),
   ADMIN_NAME: process.env.ADMIN_NAME || 'Archi Thrift Admin',
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@archithrift.com',
-  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'Admin123',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || (isProduction ? '' : 'Admin123'),
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
+  NEON_AUTH_BASE_URL: process.env.NEON_AUTH_BASE_URL || '',
+  NEON_AUTH_JWKS_URL: process.env.NEON_AUTH_JWKS_URL || '',
   CATEGORIES: [
     'Drafting tools',
     'Model-making',

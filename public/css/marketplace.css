@@ -152,6 +152,16 @@ button { color: inherit; }
 .form-message[hidden] { display: none; }
 .account-note { margin: 14px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; text-align: center; }
 
+.listing-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.artwork.has-photo::before, .artwork.has-photo::after,
+.detail-artwork.has-photo::before, .detail-artwork.has-photo::after { display: none; }
+.artwork.has-photo .artwork-mark, .detail-artwork.has-photo .artwork-mark { display: none; }
+.user-greeting { color: var(--muted); font-size: 12px; }
+.form-message.is-error { border-left-color: #b94a53; background: #fae9e9; color: #842e38; }
+.submit-button[disabled] { cursor: wait; opacity: .68; }
+
+html[data-theme="dark"] .form-message.is-error { background: #442a2c; color: #ffd2d4; }
+
 html[data-theme="dark"] .hero-overlay { background: linear-gradient(90deg, rgba(13, 18, 15, .84), rgba(13, 18, 15, .44) 68%, rgba(13, 18, 15, .2)); }
 html[data-theme="dark"] .hero-button-light { background: #f0ede4; color: #252822; }
 html[data-theme="dark"] .auth-tab.is-active { background: #303a33; }

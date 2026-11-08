@@ -4,24 +4,30 @@
   "description": "Archi Thrift — architecture student materials marketplace with user uploads, admin approval, and WhatsApp enquiries.",
   "main": "app.js",
   "scripts": {
-    "build": "node scripts/build-static-preview.js",
+    "build:client": "node scripts/build-client.js",
+    "build:static-preview": "node scripts/build-static-preview.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/seed.js"
   },
   "engines": {
-    "node": "26.x"
+    "node": "24.x"
   },
   "dependencies": {
+    "@neon/auth": "^0.8.2",
+    "@neon/config": "^1.11.3",
+    "@neon/env": "^1.6.15",
+    "@vercel/blob": "^1.1.1",
     "bcryptjs": "2.4.3",
     "cookie-session": "^2.1.0",
     "dotenv": "^16.4.7",
     "ejs": "3.1.10",
+    "esbuild": "^0.28.2",
     "express": "^4.22.3",
+    "jose": "^6.2.15",
     "multer": "1.4.5-lts.1",
     "nodemailer": "^10.2.1",
-    "pg": "^8.13.1",
-    "@vercel/blob": "^1.1.1"
+    "pg": "^8.13.1"
   }
 }

@@ -8,7 +8,6 @@
   <title>Archi Thrift | Studio Marketplace</title>
   <link rel="icon" href="/logo.png" />
   <link rel="stylesheet" href="/css/marketplace.css" />
-  <script src="/js/marketplace-data.js" defer></script>
   <script src="/js/marketplace.js" defer></script>
 </head>
 <body>
@@ -17,11 +16,11 @@
       <img src="/logo.png" alt="" />
       <span>Archi Thrift</span>
     </a>
-    <nav class="main-nav" aria-label="Main navigation">
+    <nav class="main-nav" id="main-nav" aria-label="Main navigation">
       <a class="nav-current" href="#listings">Browse</a>
       <button class="nav-link" type="button" data-auth-open data-auth-mode="register" data-auth-reason="sell">Sell an item</button>
     </nav>
-    <div class="header-actions">
+    <div class="header-actions" id="header-actions">
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">🌙</button>
       <button class="sign-in-link" type="button" data-auth-open data-auth-mode="login" data-auth-reason="signin">Sign in</button>
       <button class="join-button" type="button" data-auth-open data-auth-mode="register" data-auth-reason="register">Create account</button>
@@ -43,7 +42,7 @@
           <button class="hero-button hero-button-outline" type="button" data-auth-open data-auth-mode="register" data-auth-reason="sell">Sell an item <span aria-hidden="true">&#8594;</span></button>
         </div>
       </div>
-      <!-- <p class="hero-index">Archi Thrift <span>·</span> Lagos &amp; beyond</p> -->
+      <p class="hero-index">Archi Thrift <span>·</span> Lagos &amp; beyond</p>
     </section>
 
     <section class="catalog-section" id="listings" aria-labelledby="catalog-title">
@@ -52,7 +51,7 @@
           <p class="section-kicker">From one studio to another</p>
           <h2 id="catalog-title">On the worktable</h2>
         </div>
-        <p class="catalog-count" id="catalog-count" aria-live="polite"></p>
+        <p class="catalog-count" id="catalog-count" aria-live="polite">Loading…</p>
       </div>
       <form class="catalog-tools" id="catalog-tools" role="search">
         <label class="search-box">
@@ -77,6 +76,7 @@
       </form>
       <div class="listing-grid" id="listing-grid"></div>
       <p class="empty-state" id="empty-state" hidden>No listings match that search. Try another term or category.</p>
+      <p class="empty-state" id="load-error" role="alert" hidden>Listings could not be loaded. Please try again later.</p>
     </section>
   </main>
 
@@ -122,7 +122,7 @@
       </form>
     </section>
     <p class="form-message" id="form-message" role="status" aria-live="polite" hidden></p>
-    <p class="account-note">Browsing is open to everyone. Account actions are a preview until the backend is connected.</p>
+    <p class="account-note">Browsing is open to everyone. You need an account to sell or contact a seller.</p>
   </dialog>
 </body>
 </html>
