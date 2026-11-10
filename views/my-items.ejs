@@ -1,45 +1,46 @@
-<%- include('partials/header', { pageTitle: 'My listings' }) %>
-<section class="wrap page">
-  <div class="page-head">
-    <h1>My listings</h1>
-    <a href="/sell" class="btn btn-primary btn-sm">+ New listing</a>
-  </div>
+<%- include('partials/header', { pageTitle: 'My listings', market: true, current: 'my-items' }) %>
+<section class="app-page-content">
+  <header class="app-page-head">
+    <div><p class="section-kicker">Seller workspace</p><h1>My listings</h1><p class="app-listing-count"><%= items.length %> <%= items.length === 1 ? 'listing' : 'listings' %></p></div>
+    <a href="/sell" class="app-btn app-btn-primary">+ New listing</a>
+  </header>
   <% if (items.length === 0) { %>
-    <p class="empty">You haven't listed anything yet. <a href="/sell">List your first item</a>.</p>
+    <p class="empty-state">You haven't listed anything yet. <a href="/sell">List your first item</a>.</p>
   <% } else { %>
-    <div class="listing-list">
+    <div class="app-listing-list">
       <% items.forEach(function(item){ %>
-        <article class="listing">
-          <div class="listing-main">
-            <a class="listing-thumb" href="/item/<%= item.id %>">
-              <% if (item.image) { %><img src="<%= item.image %>" alt="" /><% } else { %><div class="ph ph-sm"><%- catIcon(item.category) %></div><% } %>
-            </a>
-            <div class="listing-info">
-              <div class="listing-top">
-                <h3><a href="/item/<%= item.id %>"><%= item.title %></a></h3>
-                <span class="status status-<%= item.status %>"><%= item.status %></span>
+        <article class="app-listing-row">
+          <a class="app-listing-thumb artwork art-<%= item.id % 4 %><%= item.image ? ' has-photo' : '' %>" href="/item/<%= item.id %>">
+            <% if (item.image) { %><img class="listing-photo" src="<%= item.image %>" alt="" loading="lazy" /><% } else { %><span class="artwork-mark" aria-hidden="true"></span><% } %>
+            <span class="artwork-category"><%= item.category %></span>
+          </a>
+          <div class="app-listing-main">
+            <div class="app-listing-info">
+              <div class="app-listing-top">
+                <h2><a href="/item/<%= item.id %>"><%= item.title %></a></h2>
+                <span class="app-status app-status-<%= item.status %>"><%= item.status %></span>
               </div>
-              <p class="muted small"><%= currency %><%= Number(item.price).toLocaleString() %> · <%= item.category %> · 📍 <%= item.location || 'N/A' %></p>
+              <p class="app-listing-meta"><span class="app-listing-price"><%= currency %><%= Number(item.price).toLocaleString() %></span><span><%= item.category %></span><span>Location: <%= item.location || 'N/A' %></span></p>
               <% if (item.status === 'rejected') { %>
-                <div class="reason-box small"><strong>Rejected:</strong> <%= item.rejectReason || 'No reason provided.' %></div>
+                <div class="app-reason-box"><strong>Rejected:</strong> <%= item.rejectReason || 'No reason provided.' %></div>
               <% } %>
-              <div class="listing-actions">
+              <div class="app-listing-actions">
                 <% if (item.status === 'approved') { %>
-                  <form method="post" action="/item/<%= item.id %>/sold"><button class="btn btn-ghost btn-sm">Mark as sold</button></form>
+                  <form method="post" action="/item/<%= item.id %>/sold"><button class="app-btn app-btn-ghost app-btn-sm" type="submit">Mark as sold</button></form>
                 <% } else if (item.status === 'sold') { %>
-                  <form method="post" action="/item/<%= item.id %>/relist"><button class="btn btn-ghost btn-sm">Relist</button></form>
+                  <form method="post" action="/item/<%= item.id %>/relist"><button class="app-btn app-btn-ghost app-btn-sm" type="submit">Relist</button></form>
                 <% } %>
-                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete this listing permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete this listing permanently?"><button class="app-btn app-btn-ghost app-btn-danger app-btn-sm" type="submit">Delete</button></form>
               </div>
             </div>
+            <details class="app-listing-history">
+              <summary>Status history (<%= (item.history||[]).length %>)</summary>
+              <%- include('partials/timeline', { item: item }) %>
+            </details>
           </div>
-          <details class="listing-tl">
-            <summary>Status history (<%= (item.history||[]).length %>)</summary>
-            <%- include('partials/timeline', { item: item }) %>
-          </details>
         </article>
       <% }) %>
     </div>
   <% } %>
 </section>
-<%- include('partials/footer') %>
+<%- include('partials/footer', { pageTitle: 'My listings', market: true, current: 'my-items' }) %>

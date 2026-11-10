@@ -1,3 +1,4 @@
+<% var useMarket = typeof market !== 'undefined' && market; %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +7,42 @@
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' · ' : '' %>Archi Thrift</title>
   <meta name="description" content="Archi Thrift — buy and sell architecture student materials. Drafting tools, model-making supplies and more." />
   <link rel="icon" href="/logo.png" />
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="<%= useMarket ? '/css/marketplace.css' : '/css/styles.css' %>" />
+  <% if (useMarket) { %><link rel="stylesheet" href="/css/app-pages.css" /><% } %>
   <script src="/js/main.js"></script>
+  <% if (useMarket) { %><script src="/js/app-pages.js" defer></script><% } %>
 </head>
-<body>
+<body<% if (useMarket) { %> class="app-page"<% } %>>
+  <% if (useMarket) { %>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Archi Thrift home">
+      <img src="/logo.png" alt="" />
+      <span>Archi Thrift</span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="/">Browse</a>
+      <% if (currentUser) { %>
+        <a href="/sell"<% if (current === 'sell') { %> class="nav-current"<% } %>>Sell an item</a>
+        <a href="/my-items"<% if (current === 'my-items') { %> class="nav-current"<% } %>>My listings</a>
+        <% if (isAdmin) { %><a href="/admin"<% if (current === 'admin') { %> class="nav-current"<% } %>>Admin</a><% } %>
+      <% } else { %>
+        <a href="/login?next=%2Fsell"<% if (current === 'sell') { %> class="nav-current"<% } %>>Sell an item</a>
+      <% } %>
+    </nav>
+    <div class="header-actions">
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">🌙</button>
+      <% if (currentUser) { %>
+        <span class="user-greeting">Hi, <%= currentUser.name.split(/\s+/)[0] %></span>
+        <form action="/logout" method="post" class="inline"><button class="sign-in-link" type="submit">Log out</button></form>
+      <% } else { %>
+        <a href="/login" class="sign-in-link">Log in</a>
+        <a href="/register" class="join-button">Register</a>
+      <% } %>
+    </div>
+  </header>
+  <main class="app-shell">
+    <% if (flash) { %><p class="form-message<%= flash.type === 'error' ? ' is-error' : '' %>" role="status"><%= flash.msg %></p><% } %>
+  <% } else { %>
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="/"><img src="/logo.png" alt="Archi Thrift" class="brand-logo" /></a>
@@ -39,3 +72,4 @@
     <div class="wrap"><div class="flash flash-<%= flash.type %>"><%= flash.msg %></div></div>
   <% } %>
   <main>
+  <% } %>

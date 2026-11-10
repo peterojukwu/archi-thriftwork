@@ -1,37 +1,59 @@
-<%- include('partials/header', { pageTitle: 'Sell an item' }) %>
-<section class="wrap auth">
-  <div class="auth-card wide">
-    <h1>List an item for sale</h1>
+<%- include('partials/header', { pageTitle: 'Sell an item', market: true, current: 'sell' }) %>
+<section class="app-page-content app-sell-page">
+  <header class="app-page-head">
+    <div>
+      <p class="section-kicker">Seller workspace</p>
+      <h1>List an item for sale</h1>
+    </div>
+  </header>
+  <div class="app-sell-layout">
+  <div class="app-card app-sell-form-card">
     <% if (isAdmin) { %>
-      <p class="muted">As an admin, your item is published to the dashboard immediately.</p>
+      <p class="app-intro">As an admin, your item is published to the dashboard immediately.</p>
     <% } else { %>
-      <p class="muted">Your item will be reviewed by an admin before it appears on the dashboard.</p>
+      <p class="app-intro">Your item will be reviewed by an admin before it appears on the dashboard.</p>
     <% } %>
-    <form method="post" action="/sell" enctype="multipart/form-data">
-      <div class="field"><label>Title *</label><input name="title" value="<%= form.title || '' %>" required placeholder="e.g. Triangular architect scale" /></div>
-      <div class="two">
-        <div class="field"><label>Price (<%= currency %>) *</label><input type="number" name="price" min="0" step="0.01" value="<%= form.price || '' %>" required /></div>
-        <div class="field"><label>Category *</label>
-          <select name="category" class="select" required>
+    <form method="post" action="/sell" enctype="multipart/form-data" data-listing-form>
+      <label class="app-field" for="sell-title"><span>Title *</span><input id="sell-title" name="title" value="<%= form.title || '' %>" required placeholder="e.g. Triangular architect scale" data-preview-title /></label>
+      <div class="field-row">
+        <label class="app-field" for="sell-price"><span>Price (<%= currency %>) *</span><input id="sell-price" type="number" name="price" min="0" step="0.01" value="<%= form.price || '' %>" required data-preview-price /></label>
+        <label class="app-field" for="sell-category"><span>Category *</span>
+          <select id="sell-category" name="category" class="select" required data-preview-category>
             <option value="" disabled <%= !form.category?'selected':'' %>>Choose…</option>
             <% cfg.CATEGORIES.forEach(function(c){ %>
               <option value="<%= c %>"<%= form.category===c?' selected':'' %>><%= c %></option>
             <% }) %>
           </select>
-        </div>
+        </label>
       </div>
-      <div class="field"><label>Condition</label>
-        <select name="condition" class="select">
+      <label class="app-field" for="sell-condition"><span>Condition</span>
+        <select id="sell-condition" name="condition" class="select">
           <% ['New','Used – like new','Used – good','Used – fair'].forEach(function(c){ %>
             <option value="<%= c %>"<%= form.condition===c?' selected':'' %>><%= c %></option>
           <% }) %>
         </select>
-      </div>
-      <div class="field"><label>Location *</label><input name="location" value="<%= form.location || '' %>" required placeholder="e.g. University of Lagos — Architecture Dept" /><span class="muted small">Where buyers can collect the item (campus / city).</span></div>
-      <div class="field"><label>Description</label><textarea name="description" rows="4" placeholder="Describe the item, condition, pickup details…"><%= form.description || '' %></textarea></div>
-      <div class="field"><label>Photo</label><input type="file" name="image" accept="image/*" /><span class="muted small">JPG/PNG/WebP, up to 4MB.</span></div>
-      <button class="btn btn-primary full"><%= isAdmin ? 'Publish item' : 'Submit for review' %></button>
+      </label>
+      <label class="app-field" for="sell-location"><span>Location *</span><input id="sell-location" name="location" value="<%= form.location || '' %>" required placeholder="e.g. University of Lagos — Architecture Dept" data-preview-location /><span class="field-hint">Where buyers can collect the item (campus / city).</span></label>
+      <label class="app-field" for="sell-description"><span>Description</span><textarea id="sell-description" name="description" rows="4" placeholder="Describe the item, condition, pickup details…"><%= form.description || '' %></textarea></label>
+      <label class="app-field" for="sell-image"><span>Photo</span><input id="sell-image" type="file" name="image" accept="image/*" data-preview-image-input /><span class="field-hint">JPG/PNG/WebP, up to 4MB.</span></label>
+      <button class="app-btn app-btn-primary app-submit" type="submit"><%= isAdmin ? 'Publish item' : 'Submit for review' %><span aria-hidden="true">&#8594;</span></button>
     </form>
   </div>
+  <aside class="app-preview-column" aria-label="Live listing preview">
+    <p class="section-kicker">Preview</p>
+    <article class="listing-card app-preview-card">
+      <div class="artwork art-0" data-preview-art>
+        <img class="listing-photo" data-preview-image alt="" hidden />
+        <span class="artwork-mark" aria-hidden="true"></span>
+        <span class="artwork-category" data-preview-category-label>Category</span>
+      </div>
+      <div class="listing-info">
+        <div class="listing-title-row"><h3 data-preview-title-label>Listing title</h3><span class="listing-price" data-currency="<%= currency %>" data-preview-price-label><%= currency %>0</span></div>
+        <p class="listing-meta"><span data-preview-condition-label><%= form.condition || 'New' %></span><span aria-hidden="true">·</span><span data-preview-location-label><%= form.location || 'Location' %></span></p>
+        <div class="listing-bottom"><span class="seller-name"><%= currentUser.name %></span><span class="text-action">Preview</span></div>
+      </div>
+    </article>
+  </aside>
+  </div>
 </section>
-<%- include('partials/footer') %>
+<%- include('partials/footer', { pageTitle: 'Sell an item', market: true, current: 'sell' }) %>

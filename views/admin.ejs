@@ -1,131 +1,141 @@
-<%- include('partials/header', { pageTitle: 'Admin' }) %>
-<section class="wrap page">
-  <div class="page-head">
-    <h1>Admin dashboard</h1>
-    <a href="/sell" class="btn btn-primary btn-sm">+ Post an item</a>
-  </div>
-  <div class="stats">
-    <div class="stat"><span class="stat-n"><%= pending.length %></span><span>Pending</span></div>
-    <div class="stat"><span class="stat-n"><%= approved.length %></span><span>Live</span></div>
-    <div class="stat"><span class="stat-n"><%= sold.length %></span><span>Sold</span></div>
-    <div class="stat"><span class="stat-n"><%= rejected.length %></span><span>Rejected</span></div>
-  </div>
+<%- include('partials/header', { pageTitle: 'Admin', market: true, current: 'admin' }) %>
+<section class="app-page-content app-admin-page">
+  <header class="app-page-head">
+    <div><p class="section-kicker">Marketplace management</p><h1>Admin dashboard</h1></div>
+    <a href="/sell" class="app-btn app-btn-primary">+ Post an item</a>
+  </header>
 
-  <h2 class="sec-title">Registered users</h2>
-  <% if (users.length === 0) { %>
-    <p class="empty">No registered users yet.</p>
-  <% } else { %>
-    <table class="tbl">
-      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th></tr></thead>
-      <tbody>
-        <% users.forEach(function(user){ %>
-          <tr>
-            <td data-l="Name"><%= user.name %></td>
-            <td data-l="Email"><a href="mailto:<%= user.email %>"><%= user.email %></a></td>
-            <td data-l="Phone"><%= user.phone || 'Not provided' %></td>
-            <td data-l="Role"><%= user.role %></td>
-            <td data-l="Joined"><%= user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—' %></td>
-          </tr>
+  <nav class="app-stats" aria-label="Dashboard sections">
+    <a class="app-stat" href="#pending-approval"><span class="app-stat-number"><%= pending.length %></span><span>Pending</span></a>
+    <a class="app-stat" href="#live-items"><span class="app-stat-number"><%= approved.length %></span><span>Live</span></a>
+    <a class="app-stat" href="#sold-items"><span class="app-stat-number"><%= sold.length %></span><span>Sold</span></a>
+    <a class="app-stat" href="#rejected-items"><span class="app-stat-number"><%= rejected.length %></span><span>Rejected</span></a>
+  </nav>
+
+  <section class="app-admin-section" id="pending-approval" aria-labelledby="pending-title">
+    <header class="app-section-head"><h2 id="pending-title">Pending approval</h2><span><%= pending.length %></span></header>
+    <% if (pending.length === 0) { %>
+      <p class="empty-state">Nothing waiting for review.</p>
+    <% } else { %>
+      <div class="app-moderation-list">
+        <% pending.forEach(function(item){ %>
+          <article class="app-moderation-row">
+            <a class="app-moderation-thumb artwork art-<%= item.id % 4 %><%= item.image ? ' has-photo' : '' %>" href="/item/<%= item.id %>">
+              <% if (item.image) { %><img class="listing-photo" src="<%= item.image %>" alt="" loading="lazy" /><% } else { %><span class="artwork-mark" aria-hidden="true"></span><% } %>
+              <span class="artwork-category"><%= item.category %></span>
+            </a>
+            <div class="app-moderation-info">
+              <h3><a href="/item/<%= item.id %>"><%= item.title %></a></h3>
+              <p class="app-listing-meta"><span class="app-listing-price"><%= currency %><%= Number(item.price).toLocaleString() %></span><span><%= item.category %></span><span>Location: <%= item.location || 'N/A' %></span><span>by <%= item.sellerName %></span></p>
+              <% if (item.description) { %><p class="app-moderation-description"><%= item.description %></p><% } %>
+            </div>
+            <div class="app-moderation-actions">
+              <form method="post" action="/admin/<%= item.id %>/approve"><button class="app-btn app-btn-primary app-btn-sm" type="submit">Approve</button></form>
+              <form method="post" action="/admin/<%= item.id %>/reject" class="app-reject-form">
+                <input type="text" name="reason" placeholder="Reason (shown to seller)" class="app-reason-input" aria-label="Reason for rejection" />
+                <button class="app-btn app-btn-ghost app-btn-danger app-btn-sm" type="submit">Reject</button>
+              </form>
+            </div>
+          </article>
         <% }) %>
-      </tbody>
-    </table>
-  <% } %>
+      </div>
+    <% } %>
+  </section>
 
-  <h2 class="sec-title">Pending approval</h2>
-  <% if (pending.length === 0) { %>
-    <p class="empty">Nothing waiting for review.</p>
-  <% } else { %>
-    <div class="mod-list">
-      <% pending.forEach(function(item){ %>
-        <div class="mod-row">
-          <a class="mod-thumb" href="/item/<%= item.id %>">
-            <% if (item.image) { %><img src="<%= item.image %>" alt="" /><% } else { %><div class="ph ph-sm"><%- catIcon(item.category) %></div><% } %>
-          </a>
-          <div class="mod-info">
-            <h3><a href="/item/<%= item.id %>"><%= item.title %></a></h3>
-            <p class="muted small"><%= currency %><%= Number(item.price).toLocaleString() %> · <%= item.category %> · 📍 <%= item.location || 'N/A' %> · by <%= item.sellerName %></p>
-            <% if (item.description) { %><p class="small"><%= item.description %></p><% } %>
-          </div>
-          <div class="mod-actions">
-            <form method="post" action="/admin/<%= item.id %>/approve"><button class="btn btn-primary btn-sm">Approve</button></form>
-            <form method="post" action="/admin/<%= item.id %>/reject" class="reject-form">
-              <input type="text" name="reason" placeholder="Reason (shown to seller)" class="reason-input" />
-              <button class="btn btn-ghost btn-sm">Reject</button>
-            </form>
-          </div>
-        </div>
-      <% }) %>
-    </div>
-  <% } %>
+  <section class="app-admin-section" id="live-items" aria-labelledby="live-title">
+    <header class="app-section-head"><h2 id="live-title">Live on dashboard</h2><span><%= approved.length %></span></header>
+    <% if (approved.length === 0) { %>
+      <p class="empty-state">No live items yet.</p>
+    <% } else { %>
+      <div class="app-table-wrap"><table class="app-table">
+        <thead><tr><th>Item</th><th>Price</th><th>Location</th><th>Seller</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% approved.forEach(function(item){ %>
+            <tr>
+              <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
+              <td data-l="Price"><%= currency %><%= Number(item.price).toLocaleString() %></td>
+              <td data-l="Location"><%= item.location || 'N/A' %></td>
+              <td data-l="Seller"><%= item.sellerName %></td>
+              <td data-l="Actions"><div class="app-table-actions">
+                <form method="post" action="/item/<%= item.id %>/sold"><button class="app-btn app-btn-ghost app-btn-sm" type="submit">Mark sold</button></form>
+                <form method="post" action="/admin/<%= item.id %>/reject"><button class="app-btn app-btn-ghost app-btn-sm" type="submit">Unpublish</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="app-btn app-btn-ghost app-btn-danger app-btn-sm" type="submit">Delete</button></form>
+              </div></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table></div>
+    <% } %>
+  </section>
 
-  <h2 class="sec-title">Live on dashboard</h2>
-  <% if (approved.length === 0) { %>
-    <p class="empty">No live items yet.</p>
-  <% } else { %>
-    <table class="tbl">
-      <thead><tr><th>Item</th><th>Price</th><th>Location</th><th>Seller</th><th></th></tr></thead>
-      <tbody>
-        <% approved.forEach(function(item){ %>
-          <tr>
-            <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
-            <td data-l="Price"><%= currency %><%= Number(item.price).toLocaleString() %></td>
-            <td data-l="Location"><%= item.location || 'N/A' %></td>
-            <td data-l="Seller"><%= item.sellerName %></td>
-            <td data-l="">
-              <div class="inline-actions">
-                <form method="post" action="/item/<%= item.id %>/sold"><button class="btn btn-ghost btn-sm">Mark sold</button></form>
-                <form method="post" action="/admin/<%= item.id %>/reject"><button class="btn btn-ghost btn-sm">Unpublish</button></form>
-                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
-              </div>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  <% } %>
+  <section class="app-admin-section" id="sold-items" aria-labelledby="sold-title">
+    <header class="app-section-head"><h2 id="sold-title">Sold</h2><span><%= sold.length %></span></header>
+    <% if (sold.length === 0) { %>
+      <p class="empty-state">No sold items.</p>
+    <% } else { %>
+      <div class="app-table-wrap"><table class="app-table">
+        <thead><tr><th>Item</th><th>Price</th><th>Seller</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% sold.forEach(function(item){ %>
+            <tr>
+              <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
+              <td data-l="Price"><%= currency %><%= Number(item.price).toLocaleString() %></td>
+              <td data-l="Seller"><%= item.sellerName %></td>
+              <td data-l="Actions"><div class="app-table-actions">
+                <form method="post" action="/item/<%= item.id %>/relist"><button class="app-btn app-btn-ghost app-btn-sm" type="submit">Relist</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="app-btn app-btn-ghost app-btn-danger app-btn-sm" type="submit">Delete</button></form>
+              </div></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table></div>
+    <% } %>
+  </section>
 
-  <% if (sold.length) { %>
-    <h2 class="sec-title">Sold</h2>
-    <table class="tbl">
-      <thead><tr><th>Item</th><th>Price</th><th>Seller</th><th></th></tr></thead>
-      <tbody>
-        <% sold.forEach(function(item){ %>
-          <tr>
-            <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
-            <td data-l="Price"><%= currency %><%= Number(item.price).toLocaleString() %></td>
-            <td data-l="Seller"><%= item.sellerName %></td>
-            <td data-l="">
-              <div class="inline-actions">
-                <form method="post" action="/item/<%= item.id %>/relist"><button class="btn btn-ghost btn-sm">Relist</button></form>
-                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
-              </div>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  <% } %>
+  <section class="app-admin-section" id="rejected-items" aria-labelledby="rejected-title">
+    <header class="app-section-head"><h2 id="rejected-title">Rejected</h2><span><%= rejected.length %></span></header>
+    <% if (rejected.length === 0) { %>
+      <p class="empty-state">No rejected items.</p>
+    <% } else { %>
+      <div class="app-table-wrap"><table class="app-table">
+        <thead><tr><th>Item</th><th>Reason</th><th>Seller</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% rejected.forEach(function(item){ %>
+            <tr>
+              <td data-l="Item"><a href="/item/<%= item.id %>"><%= item.title %></a></td>
+              <td data-l="Reason"><%= item.rejectReason || '—' %></td>
+              <td data-l="Seller"><%= item.sellerName %></td>
+              <td data-l="Actions"><div class="app-table-actions">
+                <form method="post" action="/admin/<%= item.id %>/approve"><button class="app-btn app-btn-primary app-btn-sm" type="submit">Approve</button></form>
+                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="app-btn app-btn-ghost app-btn-danger app-btn-sm" type="submit">Delete</button></form>
+              </div></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table></div>
+    <% } %>
+  </section>
 
-  <% if (rejected.length) { %>
-    <h2 class="sec-title">Rejected</h2>
-    <table class="tbl">
-      <thead><tr><th>Item</th><th>Reason</th><th>Seller</th><th></th></tr></thead>
-      <tbody>
-        <% rejected.forEach(function(item){ %>
-          <tr>
-            <td data-l="Item"><%= item.title %></td>
-            <td data-l="Reason"><span class="muted small"><%= item.rejectReason || '—' %></span></td>
-            <td data-l="Seller"><%= item.sellerName %></td>
-            <td data-l="">
-              <div class="inline-actions">
-                <form method="post" action="/admin/<%= item.id %>/approve"><button class="btn btn-primary btn-sm">Approve</button></form>
-                <form method="post" action="/item/<%= item.id %>/delete" data-confirm="Delete permanently?"><button class="btn btn-ghost btn-sm">Delete</button></form>
-              </div>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  <% } %>
+  <section class="app-admin-section" id="registered-users" aria-labelledby="users-title">
+    <header class="app-section-head"><h2 id="users-title">Registered users</h2><span><%= users.length %></span></header>
+    <% if (users.length === 0) { %>
+      <p class="empty-state">No registered users yet.</p>
+    <% } else { %>
+      <div class="app-table-wrap"><table class="app-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th></tr></thead>
+        <tbody>
+          <% users.forEach(function(user){ %>
+            <tr>
+              <td data-l="Name"><%= user.name %></td>
+              <td data-l="Email"><a href="mailto:<%= user.email %>"><%= user.email %></a></td>
+              <td data-l="Phone"><%= user.phone || 'Not provided' %></td>
+              <td data-l="Role"><%= user.role %></td>
+              <td data-l="Joined"><%= user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table></div>
+    <% } %>
+  </section>
 </section>
-<%- include('partials/footer') %>
+<%- include('partials/footer', { pageTitle: 'Admin', market: true, current: 'admin' }) %>
