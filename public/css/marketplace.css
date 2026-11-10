@@ -172,10 +172,11 @@ html[data-theme="dark"] .form-message { background: #303b32; color: #e6ebdf; }
   .listing-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
-  .site-header { height: 62px; gap: 22px; padding: 0 18px; }
+  .site-header { height: auto; min-height: 62px; flex-wrap: wrap; gap: 8px 15px; padding: 8px 18px; }
   .brand { gap: 7px; font-size: 13px; }
   .brand img { width: 30px; height: 30px; }
-  .main-nav { gap: 15px; }
+  .main-nav { order: 3; width: 100%; height: auto; flex-wrap: wrap; gap: 10px 18px; padding: 4px 0 2px; }
+  .main-nav .nav-current { height: auto; min-height: 28px; border-bottom-width: 2px; }
   .main-nav a, .nav-link, .sign-in-link { font-size: 11px; }
   .header-actions { gap: 10px; }
   .theme-toggle { width: 32px; height: 32px; flex-basis: 32px; }

@@ -101,6 +101,9 @@
     headerActions.querySelectorAll('.user-greeting, .user-items-link, [data-signout], .sign-in-link, .join-button').forEach(function (element) {
       element.remove();
     });
+    mainNav.querySelectorAll('[data-user-nav]').forEach(function (element) {
+      element.remove();
+    });
 
     var sellButton = mainNav.querySelector('.nav-link');
     if (currentUser) {
@@ -108,19 +111,28 @@
       greeting.className = 'user-greeting';
       greeting.textContent = 'Hi, ' + (currentUser.name || '').trim().split(/\s+/)[0];
 
-      var accountLink = document.createElement('a');
-      accountLink.className = 'user-items-link';
-      accountLink.href = currentUser.role === 'admin' ? '/admin' : '/my-items';
-      accountLink.textContent = currentUser.role === 'admin' ? 'Admin' : 'My items';
+      var listingsLink = document.createElement('a');
+      listingsLink.href = '/my-items';
+      listingsLink.textContent = 'My listings';
+      listingsLink.setAttribute('data-user-nav', '');
 
       var signOut = document.createElement('button');
       signOut.type = 'button';
       signOut.className = 'join-button';
       signOut.setAttribute('data-signout', '');
-      signOut.textContent = 'Sign out';
+      signOut.textContent = 'Log out';
 
-      headerActions.append(greeting, accountLink, signOut);
-      if (sellButton) sellButton.textContent = currentUser.role === 'admin' ? 'Admin' : 'Sell an item';
+      if (currentUser.role === 'admin') {
+        var adminLink = document.createElement('a');
+        adminLink.href = '/admin';
+        adminLink.textContent = 'Admin';
+        adminLink.setAttribute('data-user-nav', '');
+        mainNav.append(listingsLink, adminLink);
+      } else {
+        mainNav.append(listingsLink);
+      }
+      headerActions.append(greeting, signOut);
+      if (sellButton) sellButton.textContent = 'Sell an item';
     } else {
       headerActions.append(
         createAuthButton('login', 'signin', 'Sign in', 'sign-in-link'),
@@ -220,8 +232,8 @@
   }
 
   function navigateForSignedInAction(reason) {
-    if (currentUser.role === 'admin') window.location.assign('/admin');
-    else if (reason === 'sell') window.location.assign('/sell');
+    if (reason === 'sell') window.location.assign('/sell');
+    else if (currentUser.role === 'admin') window.location.assign('/admin');
     else window.location.assign('/my-items');
   }
 

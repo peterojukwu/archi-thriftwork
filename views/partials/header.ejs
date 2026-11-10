@@ -33,7 +33,7 @@
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">🌙</button>
       <% if (currentUser) { %>
         <span class="user-greeting">Hi, <%= currentUser.name.split(/\s+/)[0] %></span>
-        <form action="/logout" method="post" class="inline"><button class="sign-in-link" type="submit">Log out</button></form>
+        <form action="/logout" method="post" class="inline"><button class="join-button" type="submit">Log out</button></form>
       <% } else { %>
         <a href="/login" class="sign-in-link">Log in</a>
         <a href="/register" class="join-button">Register</a>
@@ -43,30 +43,28 @@
   <main class="app-shell">
     <% if (flash) { %><p class="form-message<%= flash.type === 'error' ? ' is-error' : '' %>" role="status"><%= flash.msg %></p><% } %>
   <% } else { %>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <a class="brand" href="/"><img src="/logo.png" alt="Archi Thrift" class="brand-logo" /></a>
-      <nav class="main-nav">
-        <a href="/">Browse</a>
+  <header class="site-header legacy-header">
+      <a class="brand" href="/" aria-label="Archi Thrift home"><img src="/logo.png" alt="" /><span>Archi Thrift</span></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="/#listings">Browse</a>
         <% if (currentUser) { %>
           <a href="/sell">Sell an item</a>
           <a href="/my-items">My listings</a>
-          <% if (isAdmin) { %><a href="/admin" class="nav-admin">Admin</a><% } %>
+          <% if (isAdmin) { %><a href="/admin">Admin</a><% } %>
         <% } else { %>
           <a href="/login?next=%2Fsell">Sell an item</a>
         <% } %>
       </nav>
       <div class="header-actions">
-        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">🌙</button>
         <% if (currentUser) { %>
-          <span class="hello">Hi, <%= currentUser.name.split(' ')[0] %></span>
-          <form action="/logout" method="post" class="inline"><button class="btn btn-ghost btn-sm">Log out</button></form>
+          <span class="user-greeting">Hi, <%= currentUser.name.split(/\s+/)[0] %></span>
+          <form action="/logout" method="post" class="inline"><button class="join-button" type="submit">Log out</button></form>
         <% } else { %>
-          <a href="/login" class="btn btn-ghost btn-sm">Log in</a>
-          <a href="/register" class="btn btn-primary btn-sm">Register</a>
+          <a href="/login" class="sign-in-link">Sign in</a>
+          <a href="/register" class="join-button">Create account</a>
         <% } %>
       </div>
-    </div>
   </header>
   <% if (flash) { %>
     <div class="wrap"><div class="flash flash-<%= flash.type %>"><%= flash.msg %></div></div>
