@@ -70,9 +70,7 @@
 
   <section class="app-admin-section" id="sold-items" aria-labelledby="sold-title">
     <header class="app-section-head"><h2 id="sold-title">Sold</h2><span><%= sold.length %></span></header>
-    <% if (sold.length === 0) { %>
-      <p class="empty-state">No sold items.</p>
-    <% } else { %>
+    <% if (sold.length) { %>
       <div class="app-table-wrap"><table class="app-table">
         <thead><tr><th>Item</th><th>Price</th><th>Seller</th><th>Actions</th></tr></thead>
         <tbody>
@@ -94,9 +92,7 @@
 
   <section class="app-admin-section" id="rejected-items" aria-labelledby="rejected-title">
     <header class="app-section-head"><h2 id="rejected-title">Rejected</h2><span><%= rejected.length %></span></header>
-    <% if (rejected.length === 0) { %>
-      <p class="empty-state">No rejected items.</p>
-    <% } else { %>
+    <% if (rejected.length) { %>
       <div class="app-table-wrap"><table class="app-table">
         <thead><tr><th>Item</th><th>Reason</th><th>Seller</th><th>Actions</th></tr></thead>
         <tbody>
