@@ -19,6 +19,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '20kb' }));
 
+// Post/Redirect/Get: redirects that answer a POST use 303 See Other, which every browser and proxy
+// must follow with a GET. (A bare 302 can be replayed as a POST, giving "Cannot POST /item/<id>".)
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    const redirect = res.redirect.bind(res);
+    res.redirect = (...args) => (typeof args[0] === 'number' ? redirect(...args) : redirect(303, ...args));
+  }
+  next();
+});
+
 app.use(cookieSession({
   name: 'archi-thrift-session',
   keys: [cfg.SESSION_SECRET],
