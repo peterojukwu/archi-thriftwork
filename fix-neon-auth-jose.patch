@@ -1,0 +1,21 @@
+diff --git a/neon-auth.js b/neon-auth.js
+index c0b07fb..549ad74 100644
+--- a/neon-auth.js
++++ b/neon-auth.js
+@@ -1,4 +1,7 @@
+-const { createRemoteJWKSet, jwtVerify } = require('jose');
++// jose v6 is ESM-only; load it lazily with import() so a plain require() of this file never crashes
++// the serverless function at startup (ERR_REQUIRE_ESM).
++let josePromise;
++const loadJose = () => (josePromise = josePromise || import('jose'));
+ const cfg = require('./config');
+ 
+ let jwks;
+@@ -10,6 +13,7 @@ async function verifyNeonToken(token) {
+     error.expose = true;
+     throw error;
+   }
++  const { createRemoteJWKSet, jwtVerify } = await loadJose();
+   if (!jwks) jwks = createRemoteJWKSet(new URL(cfg.NEON_AUTH_JWKS_URL));
+   const result = await jwtVerify(token, jwks, {
+     issuer: new URL(cfg.NEON_AUTH_BASE_URL).origin,
