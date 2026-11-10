@@ -127,10 +127,20 @@ const upload = multer({
   },
 });
 
+// Blob auth: either an explicit read-write token, or a connected store (BLOB_STORE_ID) where the
+// SDK authenticates through Vercel OIDC and needs no secret.
+function blobConfigured() {
+  return Boolean(cfg.BLOB_READ_WRITE_TOKEN || cfg.BLOB_STORE_ID);
+}
+
+function blobAuth() {
+  return cfg.BLOB_READ_WRITE_TOKEN ? { token: cfg.BLOB_READ_WRITE_TOKEN } : {};
+}
+
 async function uploadImage(file) {
   if (!file) return null;
-  if (!cfg.BLOB_READ_WRITE_TOKEN) {
-    const error = new Error('Image uploads are not configured. Set BLOB_READ_WRITE_TOKEN and try again.');
+  if (!blobConfigured()) {
+    const error = new Error('Image uploads are not configured. Connect a Vercel Blob store (or set BLOB_READ_WRITE_TOKEN) and try again.');
     error.statusCode = 503;
     error.expose = true;
     throw error;
@@ -139,11 +149,12 @@ async function uploadImage(file) {
   try {
     const blob = await put(`items/${Date.now()}-${randomUUID()}${extension}`, file.buffer, {
       access: 'public',
-      token: cfg.BLOB_READ_WRITE_TOKEN,
       contentType: file.mimetype,
+      ...blobAuth(),
     });
     return blob.url;
   } catch (error) {
+    console.error('[blob] upload failed:', error && error.message);
     const uploadError = new Error('Image upload failed. Please try again.');
     uploadError.statusCode = 502;
     uploadError.expose = true;
@@ -152,9 +163,9 @@ async function uploadImage(file) {
 }
 
 async function deleteImage(imageUrl) {
-  if (!imageUrl || !cfg.BLOB_READ_WRITE_TOKEN) return;
+  if (!imageUrl || !blobConfigured()) return;
   try {
-    await del(imageUrl, { token: cfg.BLOB_READ_WRITE_TOKEN });
+    await del(imageUrl, blobAuth());
   } catch (error) {
     console.error('[blob] image deletion failed:', error && error.message);
   }

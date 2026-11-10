@@ -23,6 +23,8 @@ module.exports = {
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@archithrift.com',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || (isProduction ? '' : 'Admin123'),
   BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
+  // Set automatically when a Vercel Blob store is connected; the SDK then authenticates via Vercel OIDC.
+  BLOB_STORE_ID: process.env.BLOB_STORE_ID || '',
   NEON_AUTH_BASE_URL: process.env.NEON_AUTH_BASE_URL || '',
   NEON_AUTH_JWKS_URL: process.env.NEON_AUTH_JWKS_URL || '',
   CATEGORIES: [
