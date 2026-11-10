@@ -65,20 +65,5 @@
       });
     }
 
-    document.querySelectorAll('form[action="/login"], form[action="/register"]').forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-        if (!form.reportValidity()) return;
-        var message = document.getElementById('auth-preview-message');
-        if (!message) {
-          message = document.createElement('div');
-          message.id = 'auth-preview-message';
-          message.className = 'wrap';
-          message.innerHTML = '<div class="flash flash-error"></div>';
-          document.querySelector('.site-header').after(message);
-        }
-        message.firstElementChild.textContent = 'Account access is not connected yet. This preview does not store your details.';
-      });
-    });
   });
 })();

@@ -5,8 +5,10 @@ data/db.json
 public/uploads/*
 !public/uploads/.gitkeep
 .env*
-config.js
+!.env.example
 public/item/
 public/login.html
 public/register.html
 public/js/marketplace-data.js
+public/js/neon-auth-client.bundle.js
+.neon

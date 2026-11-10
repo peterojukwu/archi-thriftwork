@@ -1,5 +1,7 @@
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
 const cfg = require('./config');
 
 if (!process.env.DATABASE_URL) {
@@ -191,6 +193,8 @@ async function seedInitialData() {
   try {
     await client.query('BEGIN');
     await client.query('SELECT pg_advisory_xact_lock($1)', [73419261]);
+    const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+    await client.query(schema);
     let adminResult = await client.query("SELECT * FROM users WHERE role = 'admin' ORDER BY id LIMIT 1");
     let admin = mapUser(adminResult.rows[0]);
     if (!admin) {

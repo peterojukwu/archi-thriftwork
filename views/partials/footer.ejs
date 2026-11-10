@@ -1,3 +1,14 @@
+  <% var useMarket = typeof market !== 'undefined' && market; %>
+  <% if (useMarket) { %>
+  </main>
+  <footer class="site-footer">
+    <a class="footer-brand" href="/">Archi Thrift</a>
+    <span>Pass it on. Make something new.</span>
+    <span class="app-footer-enquiries">Enquiries are handled directly on WhatsApp. &copy; <%= new Date().getFullYear() %> Archi Thrift.</span>
+  </footer>
+  </body>
+  </html>
+  <% } else { %>
   </main>
   <footer class="site-footer">
     <div class="wrap footer-inner">
@@ -10,3 +21,4 @@
   </footer>
 </body>
 </html>
+<% } %>

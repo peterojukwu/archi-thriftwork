@@ -1,16 +1,23 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "public" }
+  "framework": null,
+  "outputDirectory": "public",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 15,
+      "includeFiles": "{views/**,schema.sql}"
     }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "^/item/(\\d+)/?$", "dest": "/item/$1.html" },
-    { "src": "^/(sell|my-items|admin)/?$", "dest": "/login.html" },
-    { "src": "^/(login|register)/?$", "dest": "/$1.html" }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index?__path=/api/:path*" },
+    { "source": "/item/:id/:action", "destination": "/api/index?__path=/item/:id/:action" },
+    { "source": "/admin/:id/:action", "destination": "/api/index?__path=/admin/:id/:action" },
+    { "source": "/item/:id", "destination": "/api/index?__path=/item/:id" },
+    { "source": "/admin", "destination": "/api/index?__path=/admin" },
+    { "source": "/sell", "destination": "/api/index?__path=/sell" },
+    { "source": "/my-items", "destination": "/api/index?__path=/my-items" },
+    { "source": "/login", "destination": "/api/index?__path=/login" },
+    { "source": "/register", "destination": "/api/index?__path=/register" },
+    { "source": "/logout", "destination": "/api/index?__path=/logout" }
   ]
 }

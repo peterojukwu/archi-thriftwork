@@ -1,5 +1,5 @@
 const path = require('path');
-const { randomUUID } = require('crypto');
+const { randomBytes, randomUUID } = require('crypto');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const multer = require('multer');
@@ -8,6 +8,7 @@ const { put, del } = require('@vercel/blob');
 
 const cfg = require('./config');
 const store = require('./db');
+const { verifyNeonToken } = require('./neon-auth');
 
 const app = express();
 if (cfg.NODE_ENV === 'production') app.set('trust proxy', 1);
@@ -16,6 +17,17 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '20kb' }));
+
+// Post/Redirect/Get: redirects that answer a POST use 303 See Other, which every browser and proxy
+// must follow with a GET. (A bare 302 can be replayed as a POST, giving "Cannot POST /item/<id>".)
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    const redirect = res.redirect.bind(res);
+    res.redirect = (...args) => (typeof args[0] === 'number' ? redirect(...args) : redirect(303, ...args));
+  }
+  next();
+});
 
 app.use(cookieSession({
   name: 'archi-thrift-session',
@@ -36,7 +48,71 @@ app.use(asyncHandler(async (req, res, next) => {
 }));
 
 app.use(asyncHandler(async (req, res, next) => {
-  const user = req.session && req.session.userId ? await store.findUserById(req.session.userId) : null;
+  let user = req.session && req.session.userId ? await store.findUserById(req.session.userId) : null;
+  if (req.session?.neonExpiresAt && Date.now() >= req.session.neonExpiresAt) {
+    req.session = null;
+    user = null;
+  }
+  const authorization = req.get('authorization') || '';
+  const bearer = authorization.match(/^Bearer\s+(.+)$/i);
+  if (bearer) {
+    let identity;
+    try {
+      identity = await verifyNeonToken(bearer[1]);
+    } catch (error) {
+      if (!error.statusCode) {
+        error.statusCode = 401;
+        error.expose = true;
+        error.message = 'Your Neon Auth session is invalid or expired. Please sign in again.';
+      }
+      throw error;
+    }
+    if (!Number.isFinite(identity.exp)) {
+      const error = new Error('Neon Auth token is missing an expiration time.');
+      error.statusCode = 401;
+      error.expose = true;
+      throw error;
+    }
+    const email = typeof identity.email === 'string' ? identity.email.trim().toLowerCase() : '';
+    if (!email) {
+      const error = new Error('Neon Auth did not provide a verified email address.');
+      error.statusCode = 401;
+      error.expose = true;
+      throw error;
+    }
+    user = await store.findUserByEmail(email);
+    const emailVerified = identity.email_verified === true || identity.emailVerified === true;
+    if (user && user.role === 'admin' && !emailVerified) {
+      const error = new Error('Verify your email before using this admin account.');
+      error.statusCode = 403;
+      error.expose = true;
+      throw error;
+    }
+    if (!user) {
+      const phone = typeof req.body?.phone === 'string'
+        ? req.body.phone.replace(/[\s().-]/g, '')
+        : '';
+      if (phone && !/^\+?\d{7,15}$/.test(phone)) {
+        const error = new Error('Enter a valid phone number with 7 to 15 digits.');
+        error.statusCode = 400;
+        error.expose = true;
+        throw error;
+      }
+      const name = typeof identity.name === 'string' && identity.name.trim()
+        ? identity.name.trim()
+        : email.split('@')[0];
+      const passwordHash = await bcrypt.hash(randomBytes(32).toString('hex'), 10);
+      try {
+        user = await store.addUser({ name, email, phone: phone || null, passwordHash, role: 'user' });
+      } catch (error) {
+        if (error.code !== '23505') throw error;
+        user = await store.findUserByEmail(email);
+      }
+    }
+    req.session = req.session || {};
+    req.session.userId = user.id;
+    req.session.neonExpiresAt = identity.exp * 1000;
+  }
   res.locals.currentUser = user;
   res.locals.isAdmin = !!(user && user.role === 'admin');
   res.locals.cfg = cfg;
@@ -61,10 +137,20 @@ const upload = multer({
   },
 });
 
+// Blob auth: either an explicit read-write token, or a connected store (BLOB_STORE_ID) where the
+// SDK authenticates through Vercel OIDC and needs no secret.
+function blobConfigured() {
+  return Boolean(cfg.BLOB_READ_WRITE_TOKEN || cfg.BLOB_STORE_ID);
+}
+
+function blobAuth() {
+  return cfg.BLOB_READ_WRITE_TOKEN ? { token: cfg.BLOB_READ_WRITE_TOKEN } : {};
+}
+
 async function uploadImage(file) {
   if (!file) return null;
-  if (!cfg.BLOB_READ_WRITE_TOKEN) {
-    const error = new Error('Image uploads are not configured. Set BLOB_READ_WRITE_TOKEN and try again.');
+  if (!blobConfigured()) {
+    const error = new Error('Image uploads are not configured. Connect a Vercel Blob store (or set BLOB_READ_WRITE_TOKEN) and try again.');
     error.statusCode = 503;
     error.expose = true;
     throw error;
@@ -73,11 +159,12 @@ async function uploadImage(file) {
   try {
     const blob = await put(`items/${Date.now()}-${randomUUID()}${extension}`, file.buffer, {
       access: 'public',
-      token: cfg.BLOB_READ_WRITE_TOKEN,
       contentType: file.mimetype,
+      ...blobAuth(),
     });
     return blob.url;
   } catch (error) {
+    console.error('[blob] upload failed:', error && error.message);
     const uploadError = new Error('Image upload failed. Please try again.');
     uploadError.statusCode = 502;
     uploadError.expose = true;
@@ -86,9 +173,9 @@ async function uploadImage(file) {
 }
 
 async function deleteImage(imageUrl) {
-  if (!imageUrl || !cfg.BLOB_READ_WRITE_TOKEN) return;
+  if (!imageUrl || !blobConfigured()) return;
   try {
-    await del(imageUrl, { token: cfg.BLOB_READ_WRITE_TOKEN });
+    await del(imageUrl, blobAuth());
   } catch (error) {
     console.error('[blob] image deletion failed:', error && error.message);
   }
@@ -219,6 +306,7 @@ app.post('/logout', (req, res) => {
 
 module.exports = { app, upload, requireLogin, requireAdmin, store, cfg, flash, bcrypt, asyncHandler, uploadImage, deleteImage };
 require('./routes-items');
+require('./routes-api');
 
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
@@ -226,6 +314,12 @@ app.use((error, req, res, next) => {
   const isTooLarge = error.code === 'LIMIT_FILE_SIZE';
   const isBadImage = error.message === 'Only image files are allowed';
   const status = isTooLarge ? 413 : isBadImage ? 400 : error.statusCode || 500;
+  if (req.path === '/api' || req.path.startsWith('/api/')) {
+    res.set('Cache-Control', 'no-store');
+    return res.status(status).json({
+      error: error.expose ? error.message : 'Internal server error.',
+    });
+  }
   const message = isTooLarge
     ? 'Image must be 4MB or smaller.'
     : isBadImage
